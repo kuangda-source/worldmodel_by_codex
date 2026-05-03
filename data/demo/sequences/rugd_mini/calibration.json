@@ -1,0 +1,11 @@
+{
+  "camera": {
+    "width": 0,
+    "height": 0,
+    "fx": null,
+    "fy": null,
+    "cx": null,
+    "cy": null
+  },
+  "note": "Imported from RUGD-style RGB/semantic pairs; calibration unknown."
+}

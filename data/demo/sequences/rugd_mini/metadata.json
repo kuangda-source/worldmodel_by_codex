@@ -1,0 +1,16 @@
+{
+  "scene_id": "rugd_mini",
+  "terrain": "gravel",
+  "weather": "sunny",
+  "time_of_day": "day",
+  "difficulty": "real-data",
+  "tags": [
+    "rugd",
+    "public-dataset",
+    "semantic-segmentation",
+    "unstructured-road"
+  ],
+  "has_lidar": false,
+  "has_occupancy": true,
+  "vehicle_id": "ugv_default"
+}

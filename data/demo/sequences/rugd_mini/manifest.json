@@ -1,0 +1,170 @@
+[
+  {
+    "frame": "frame_0000",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00001.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00001.png",
+    "image": "images\\frame_0000.png",
+    "label": "labels\\semantic_0000.png"
+  },
+  {
+    "frame": "frame_0001",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00006.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00006.png",
+    "image": "images\\frame_0001.png",
+    "label": "labels\\semantic_0001.png"
+  },
+  {
+    "frame": "frame_0002",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00011.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00011.png",
+    "image": "images\\frame_0002.png",
+    "label": "labels\\semantic_0002.png"
+  },
+  {
+    "frame": "frame_0003",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00016.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00016.png",
+    "image": "images\\frame_0003.png",
+    "label": "labels\\semantic_0003.png"
+  },
+  {
+    "frame": "frame_0004",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00021.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00021.png",
+    "image": "images\\frame_0004.png",
+    "label": "labels\\semantic_0004.png"
+  },
+  {
+    "frame": "frame_0005",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00026.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00026.png",
+    "image": "images\\frame_0005.png",
+    "label": "labels\\semantic_0005.png"
+  },
+  {
+    "frame": "frame_0006",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00031.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00031.png",
+    "image": "images\\frame_0006.png",
+    "label": "labels\\semantic_0006.png"
+  },
+  {
+    "frame": "frame_0007",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00036.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00036.png",
+    "image": "images\\frame_0007.png",
+    "label": "labels\\semantic_0007.png"
+  },
+  {
+    "frame": "frame_0008",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00041.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00041.png",
+    "image": "images\\frame_0008.png",
+    "label": "labels\\semantic_0008.png"
+  },
+  {
+    "frame": "frame_0009",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00046.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00046.png",
+    "image": "images\\frame_0009.png",
+    "label": "labels\\semantic_0009.png"
+  },
+  {
+    "frame": "frame_0010",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00051.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00051.png",
+    "image": "images\\frame_0010.png",
+    "label": "labels\\semantic_0010.png"
+  },
+  {
+    "frame": "frame_0011",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00056.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00056.png",
+    "image": "images\\frame_0011.png",
+    "label": "labels\\semantic_0011.png"
+  },
+  {
+    "frame": "frame_0012",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00061.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00061.png",
+    "image": "images\\frame_0012.png",
+    "label": "labels\\semantic_0012.png"
+  },
+  {
+    "frame": "frame_0013",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00066.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00066.png",
+    "image": "images\\frame_0013.png",
+    "label": "labels\\semantic_0013.png"
+  },
+  {
+    "frame": "frame_0014",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00071.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00071.png",
+    "image": "images\\frame_0014.png",
+    "label": "labels\\semantic_0014.png"
+  },
+  {
+    "frame": "frame_0015",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00076.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00076.png",
+    "image": "images\\frame_0015.png",
+    "label": "labels\\semantic_0015.png"
+  },
+  {
+    "frame": "frame_0016",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00081.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00081.png",
+    "image": "images\\frame_0016.png",
+    "label": "labels\\semantic_0016.png"
+  },
+  {
+    "frame": "frame_0017",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00086.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00086.png",
+    "image": "images\\frame_0017.png",
+    "label": "labels\\semantic_0017.png"
+  },
+  {
+    "frame": "frame_0018",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00091.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00091.png",
+    "image": "images\\frame_0018.png",
+    "label": "labels\\semantic_0018.png"
+  },
+  {
+    "frame": "frame_0019",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00096.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00096.png",
+    "image": "images\\frame_0019.png",
+    "label": "labels\\semantic_0019.png"
+  },
+  {
+    "frame": "frame_0020",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00101.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00101.png",
+    "image": "images\\frame_0020.png",
+    "label": "labels\\semantic_0020.png"
+  },
+  {
+    "frame": "frame_0021",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00106.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00106.png",
+    "image": "images\\frame_0021.png",
+    "label": "labels\\semantic_0021.png"
+  },
+  {
+    "frame": "frame_0022",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00111.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00111.png",
+    "image": "images\\frame_0022.png",
+    "label": "labels\\semantic_0022.png"
+  },
+  {
+    "frame": "frame_0023",
+    "source_image": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_frames-with-annotations\\creek\\creek_00116.png",
+    "source_label": "D:\\program\\worldmodel_codex\\data\\public\\RUGD_hf_mini\\RUGD_annotations\\creek\\creek_00116.png",
+    "image": "images\\frame_0023.png",
+    "label": "labels\\semantic_0023.png"
+  }
+]

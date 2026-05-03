@@ -1,0 +1,16 @@
+{
+  "scene_id": "seq_0001",
+  "terrain": "mountain",
+  "weather": "sunny",
+  "time_of_day": "day",
+  "difficulty": "medium",
+  "tags": [
+    "trail",
+    "rocks",
+    "slope",
+    "forest-edge"
+  ],
+  "has_lidar": false,
+  "has_occupancy": true,
+  "vehicle_id": "ugv_default"
+}

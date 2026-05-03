@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+node_modules/
+dist/
+.vite/
+
+artifacts/
+*.sqlite3
+*.db
+
+# Local downloaded public datasets and test imports should not be committed.
+data/public/
+data/demo/sequences/*_pytest/
+data/demo/sequences/*_smoke/
+
+.env
+.DS_Store
+Thumbs.db

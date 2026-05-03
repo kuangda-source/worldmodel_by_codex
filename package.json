@@ -1,0 +1,12 @@
+{
+  "name": "or-wm-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OR-WM Studio: off-road world model closed-loop demo workspace.",
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "python -m uvicorn backend.app.main:app --reload --port 8000",
+    "generate:demo": "python ml/generate_demo_assets.py",
+    "test:backend": "pytest backend/tests"
+  }
+}
