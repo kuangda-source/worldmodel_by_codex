@@ -33,6 +33,8 @@ from .schemas import (
     SequenceDetail,
     SequenceQuality,
     ModelCatalogItem,
+    TraversabilityBatchPredictRequest,
+    TraversabilityBatchPredictResponse,
     TraversabilityPredictRequest,
     TraversabilityPredictResponse,
     TraversabilityTrainRequest,
@@ -60,7 +62,7 @@ from .services.rl import get_replay, train_rl
 from .services.runs import compare_run_records, export_run_record, get_run_record, list_run_records
 from .services.scenes import generate_scene
 from .services.trajectory import predict_trajectory, train_trajectory
-from .services.traversability import predict_sequence_traversability, train_traversability
+from .services.traversability import predict_all_traversability, predict_sequence_traversability, train_traversability
 from .services.vehicles import get_vehicles, save_vehicle
 from .services.world_model import predict_world_model, train_world_model
 from .storage import init_db
@@ -257,6 +259,11 @@ def create_traversability_training(payload: TraversabilityTrainRequest) -> Trave
 @app.post("/api/traversability/predict", response_model=TraversabilityPredictResponse)
 def create_traversability_prediction(payload: TraversabilityPredictRequest) -> TraversabilityPredictResponse:
     return predict_sequence_traversability(payload)
+
+
+@app.post("/api/traversability/predict-sequence", response_model=TraversabilityBatchPredictResponse)
+def create_traversability_sequence_prediction(payload: TraversabilityBatchPredictRequest) -> TraversabilityBatchPredictResponse:
+    return predict_all_traversability(payload)
 
 
 @app.post("/api/trajectory/train", response_model=TrajectoryTrainResponse)

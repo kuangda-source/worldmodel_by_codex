@@ -337,6 +337,14 @@ class TraversabilityPredictRequest(BaseModel):
     frame_index: int = Field(default=0, ge=0)
 
 
+class TraversabilityFramePrediction(BaseModel):
+    frame_index: int
+    frame_url: str
+    assets: dict[str, str]
+    metrics: dict[str, float]
+    counts: dict[str, int]
+
+
 class TraversabilityPredictResponse(BaseModel):
     prediction_id: str
     model_id: str
@@ -344,6 +352,23 @@ class TraversabilityPredictResponse(BaseModel):
     assets: dict[str, str]
     metrics: dict[str, float]
     counts: dict[str, int]
+    provenance: Provenance
+
+
+class TraversabilityBatchPredictRequest(BaseModel):
+    sequence_id: str = "seq_0001"
+    model_id: str | None = None
+    max_frames: int = Field(default=500, ge=1, le=2000)
+
+
+class TraversabilityBatchPredictResponse(BaseModel):
+    prediction_id: str
+    model_id: str
+    sequence_id: str
+    frame_count: int
+    frames: list[TraversabilityFramePrediction]
+    manifest_url: str
+    metrics: dict[str, float]
     provenance: Provenance
 
 

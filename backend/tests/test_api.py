@@ -123,6 +123,32 @@ def test_generation_reconstruction_training_and_replay() -> None:
         assert traversability_predict.json()["metrics"]["risk_score"] > 0
         assert traversability_predict.json()["provenance"]["source"] == "synthetic"
 
+        traversability_batch = client.post(
+            "/api/traversability/predict-sequence",
+            json={"sequence_id": "seq_0001", "model_id": trav_run_id, "max_frames": 3},
+        )
+        assert traversability_batch.status_code == 200
+        batch_payload = traversability_batch.json()
+        assert batch_payload["frame_count"] == 3
+        assert len(batch_payload["frames"]) == 3
+        assert batch_payload["frames"][1]["frame_index"] == 1
+        assert "overlay" in batch_payload["frames"][1]["assets"]
+        assert "manifest" in batch_payload["manifest_url"]
+
+        traversability_batch_job = client.post(
+            "/api/jobs/launch",
+            json={
+                "label": "Segment all frames",
+                "endpoint": "/api/traversability/predict-sequence",
+                "method": "POST",
+                "body": {"sequence_id": "seq_0001", "model_id": trav_run_id, "max_frames": 2},
+                "run_async": False,
+            },
+        )
+        assert traversability_batch_job.status_code == 200
+        assert traversability_batch_job.json()["job"]["kind"] == "traversability_predict_batch"
+        assert traversability_batch_job.json()["result"]["frame_count"] == 2
+
         pytest.importorskip("torch")
         trajectory_train = client.post(
             "/api/trajectory/train",

@@ -638,7 +638,7 @@ button:disabled {
   min-width: 0;
   margin: 0;
   display: grid;
-  grid-template-rows: 30px minmax(0, 1fr);
+  grid-template-rows: 42px minmax(0, 1fr);
   border: 1px solid #cfd7cd;
   border-radius: 8px;
   overflow: hidden;
@@ -646,13 +646,28 @@ button:disabled {
 }
 
 .map-image figcaption {
-  display: flex;
-  align-items: center;
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 2px;
   padding: 0 10px;
   color: #46564f;
   font-size: 12px;
   font-weight: 700;
   border-bottom: 1px solid #dce3da;
+}
+
+.map-image figcaption span,
+.map-image figcaption small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-image figcaption small {
+  color: #7a8780;
+  font-size: 10px;
+  font-weight: 600;
 }
 
 .map-image img {
@@ -1388,6 +1403,18 @@ button:disabled {
   color: #7d8580;
   background: #eef0ed;
   border-color: #d8ded6;
+}
+
+.launch-choice-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.launch-choice-row button {
+  min-height: 26px;
+  color: #30463d;
+  background: #f8fbf7;
 }
 
 .launch-action-editor details {

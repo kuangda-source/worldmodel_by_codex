@@ -44,6 +44,8 @@ import type {
   TrajectoryPredictResponse,
   TrajectoryTrainResponse,
   TartanDriveImportResponse,
+  TraversabilityBatchPredictResponse,
+  TraversabilityFramePrediction,
   TraversabilityPredictResponse,
   TraversabilityTrainResponse,
   Vehicle,
@@ -101,6 +103,7 @@ const compareKinds = [
   { label: 'All kinds', value: 'all' },
   { label: 'Terrain train', value: 'traversability_train' },
   { label: 'Terrain pred', value: 'traversability_predict' },
+  { label: 'Terrain batch', value: 'traversability_predict_batch' },
   { label: 'Traj train', value: 'trajectory_train' },
   { label: 'Traj pred', value: 'trajectory_predict' },
   { label: 'WM train', value: 'world_model_train' },
@@ -536,8 +539,14 @@ function parseFrameIndex(value: unknown): number | null {
   return null
 }
 
+function batchSegmentBody(body: Record<string, unknown>): Record<string, unknown> {
+  const { frame_index: _frameIndex, ...rest } = body
+  return { ...rest, max_frames: rest.max_frames ?? 500 }
+}
+
 function ModelCatalogPanel({ items, onLaunch }: { items: ModelCatalogItem[]; onLaunch: (action: ModelLaunchAction) => void }) {
   const [bodyDrafts, setBodyDrafts] = useState<Record<string, string>>({})
+  const [choiceOpen, setChoiceOpen] = useState<Record<string, boolean>>({})
 
   if (items.length === 0) return <div className="quality-empty">Model catalog: NaN</div>
   return (
@@ -560,16 +569,52 @@ function ModelCatalogPanel({ items, onLaunch }: { items: ModelCatalogItem[]; onL
               const key = `${item.id}-${action.id}`
               const bodyText = bodyDrafts[key] ?? JSON.stringify(action.body, null, 2)
               const parsedBody = tryParseJsonObject(bodyText)
+              const isSegmentAction = action.endpoint === '/api/traversability/predict'
               return (
                 <div className="launch-action-editor" key={key}>
                   <button
                     disabled={!action.enabled || parsedBody === null}
-                    onClick={() => parsedBody && onLaunch({ ...action, body: parsedBody })}
+                    onClick={() => {
+                      if (!parsedBody) return
+                      if (isSegmentAction) {
+                        setChoiceOpen((current) => ({ ...current, [key]: !current[key] }))
+                        return
+                      }
+                      onLaunch({ ...action, body: parsedBody })
+                    }}
                     title={parsedBody === null ? 'Invalid JSON body' : action.disabled_reason ?? JSON.stringify(parsedBody)}
                     type="button"
                   >
                     {action.label}
                   </button>
+                  {isSegmentAction && choiceOpen[key] && parsedBody ? (
+                    <div className="launch-choice-row">
+                      <button
+                        onClick={() => {
+                          setChoiceOpen((current) => ({ ...current, [key]: false }))
+                          onLaunch({ ...action, label: 'Segment current frame', body: parsedBody })
+                        }}
+                        type="button"
+                      >
+                        Current frame
+                      </button>
+                      <button
+                        onClick={() => {
+                          setChoiceOpen((current) => ({ ...current, [key]: false }))
+                          onLaunch({
+                            ...action,
+                            id: `${action.id}_sequence`,
+                            label: 'Segment all frames',
+                            endpoint: '/api/traversability/predict-sequence',
+                            body: batchSegmentBody(parsedBody),
+                          })
+                        }}
+                        type="button"
+                      >
+                        All frames
+                      </button>
+                    </div>
+                  ) : null}
                   <details>
                     <summary>params</summary>
                     <textarea
@@ -666,6 +711,7 @@ function App() {
   const [prediction, setPrediction] = useState<WorldModelPredictResponse | null>(null)
   const [travTrain, setTravTrain] = useState<TraversabilityTrainResponse | null>(null)
   const [travPrediction, setTravPrediction] = useState<TraversabilityPredictResponse | null>(null)
+  const [travBatchPrediction, setTravBatchPrediction] = useState<TraversabilityBatchPredictResponse | null>(null)
   const [travPredictionFrame, setTravPredictionFrame] = useState<number | null>(null)
   const [terrainLayerMode, setTerrainLayerMode] = useState<'semantic' | 'segment'>('semantic')
   const [trajTrain, setTrajTrain] = useState<TrajectoryTrainResponse | null>(null)
@@ -733,19 +779,23 @@ function App() {
   const heightmapImage = reconstruction?.assets.heightmap ?? scene?.assets.heightmap ?? sequence?.occupancy.find((item) => item.includes('heightmap')) ?? ''
   const riskImage = prediction?.assets.risk ?? reconstruction?.assets.risk ?? scene?.assets.risk ?? sequence?.occupancy.find((item) => item.includes('risk')) ?? ''
   const datasetSemanticImage = sequence?.labels?.[frame] ?? ''
-  const segmentMatchesFrame = travPrediction !== null && travPredictionFrame === frame
+  const batchFramePrediction = travBatchPrediction?.frames.find((item) => item.frame_index === frame) ?? null
+  const singleSegmentMatchesFrame = travPrediction !== null && travPredictionFrame === frame
+  const activeSegmentPrediction: TraversabilityPredictResponse | TraversabilityFramePrediction | null =
+    batchFramePrediction ?? (singleSegmentMatchesFrame ? travPrediction : null)
+  const segmentMatchesFrame = activeSegmentPrediction !== null
   const showSegmentResult = terrainLayerMode === 'segment' && segmentMatchesFrame
-  const terrainSecondaryImage = showSegmentResult ? travPrediction?.assets.overlay ?? '' : datasetSemanticImage
-  const terrainTraversabilityImage = showSegmentResult ? travPrediction?.assets.traversability ?? '' : ''
-  const terrainRiskImage = showSegmentResult ? travPrediction?.assets.risk ?? '' : ''
+  const terrainSecondaryImage = showSegmentResult ? activeSegmentPrediction?.assets.overlay ?? '' : datasetSemanticImage
+  const terrainTraversabilityImage = showSegmentResult ? activeSegmentPrediction?.assets.traversability ?? '' : ''
+  const terrainRiskImage = showSegmentResult ? activeSegmentPrediction?.assets.risk ?? '' : ''
   const trajectoryImage = trajPrediction?.assets.trajectory ?? ''
   const predictionImage = prediction?.assets.future_trajectory ?? prediction?.assets.occupancy ?? ''
   const successRate = rlTrain?.metrics.success_rate ?? Number.NaN
   const collisionRate = rlTrain?.metrics.collision_rate ?? Number.NaN
   const pathLength = rlTrain?.metrics.path_length_m ?? Number.NaN
   const uncertainty = prediction?.uncertainty ?? Number.NaN
-  const traversableRatio = showSegmentResult ? travPrediction?.metrics.traversable_ratio ?? Number.NaN : Number.NaN
-  const terrainRisk = showSegmentResult ? travPrediction?.metrics.risk_score ?? Number.NaN : Number.NaN
+  const traversableRatio = showSegmentResult ? activeSegmentPrediction?.metrics.traversable_ratio ?? Number.NaN : Number.NaN
+  const terrainRisk = showSegmentResult ? activeSegmentPrediction?.metrics.risk_score ?? Number.NaN : Number.NaN
   const trajectoryAde = trajPrediction?.metrics.ade ?? Number.NaN
   const trajectoryFde = trajPrediction?.metrics.fde ?? Number.NaN
   const trainCurveData = trajTrain?.training_curve ?? travTrain?.training_curve ?? wmTrain?.metrics ?? []
@@ -762,7 +812,7 @@ function App() {
   const viewProvenance =
     activeView === 'terrain'
       ? showSegmentResult
-        ? travPrediction?.provenance
+        ? travBatchPrediction?.provenance ?? travPrediction?.provenance
         : semanticProvenance
       : activeView === 'trajectory'
         ? trajPrediction?.provenance ?? trajTrain?.provenance
@@ -775,7 +825,7 @@ function App() {
               : activeView === 'bev'
                 ? reconstruction?.provenance ?? scene?.provenance
                 : scene?.provenance
-  const metricProvenance = rlTrain?.provenance ?? (showSegmentResult ? travPrediction?.provenance : undefined)
+  const metricProvenance = rlTrain?.provenance ?? (showSegmentResult ? travBatchPrediction?.provenance ?? travPrediction?.provenance : undefined)
   const currentQuality = qualities.find((item) => item.sequence_id === sequence?.id)
   const currentSourceCard = sourceCards.find((item) => item.sequence_id === sequence?.id)
   const runtimeModelCatalog = useMemo(
@@ -909,7 +959,15 @@ function App() {
         break
       case '/api/traversability/predict':
         setTravPrediction(result as TraversabilityPredictResponse)
+        setTravBatchPrediction(null)
         setTravPredictionFrame(parseFrameIndex(action.body.frame_index) ?? frame)
+        setTerrainLayerMode('segment')
+        setActiveView('terrain')
+        break
+      case '/api/traversability/predict-sequence':
+        setTravBatchPrediction(result as TraversabilityBatchPredictResponse)
+        setTravPrediction(null)
+        setTravPredictionFrame(null)
         setTerrainLayerMode('segment')
         setActiveView('terrain')
         break
@@ -934,6 +992,8 @@ function App() {
     const normalizedAction =
       action.endpoint === '/api/traversability/predict' && parseFrameIndex(action.body.frame_index) === null
         ? { ...action, body: { ...action.body, frame_index: frame } }
+        : action.endpoint === '/api/traversability/predict-sequence'
+          ? { ...action, body: { ...action.body, sequence_id: sequence?.id ?? action.body.sequence_id, max_frames: action.body.max_frames ?? frameCount } }
         : action
     await runAction(
       normalizedAction.label,
@@ -1063,6 +1123,7 @@ function App() {
         setSequence(detail)
         setFrame(0)
         setTravPrediction(null)
+        setTravBatchPrediction(null)
         setTravPredictionFrame(null)
         setTerrainLayerMode('semantic')
         setTerrain(detail.metadata.terrain)
@@ -1090,6 +1151,7 @@ function App() {
         setSequence(detail)
         setFrame(0)
         setTravPrediction(null)
+        setTravBatchPrediction(null)
         setTravPredictionFrame(null)
         setTerrainLayerMode('semantic')
         setTerrain(detail.metadata.terrain)
@@ -1109,6 +1171,7 @@ function App() {
         }),
       (value) => {
         setTravPrediction(value)
+        setTravBatchPrediction(null)
         setTravPredictionFrame(frame)
         setTerrainLayerMode('segment')
         setActiveView('terrain')
@@ -1226,6 +1289,7 @@ function App() {
       setSequence(value)
       setFrame(0)
       setTravPrediction(null)
+      setTravBatchPrediction(null)
       setTravPredictionFrame(null)
       setTerrainLayerMode('semantic')
       setTerrain(value.metadata.terrain)
@@ -1401,6 +1465,7 @@ function App() {
                   setSequence(value)
                   setFrame(0)
                   setTravPrediction(null)
+                  setTravBatchPrediction(null)
                   setTravPredictionFrame(null)
                   setTerrainLayerMode('semantic')
                 })
@@ -1560,26 +1625,34 @@ function App() {
                   </button>
                   <button
                     className={showSegmentResult ? 'active' : ''}
-                    disabled={!travPrediction}
+                    disabled={!travPrediction && !travBatchPrediction}
                     onClick={() => setTerrainLayerMode('segment')}
-                    title={travPredictionFrame !== null ? `Segment result belongs to frame ${travPredictionFrame + 1}` : 'No segment result yet'}
+                    title={
+                      travBatchPrediction
+                        ? `Batch segment result contains ${travBatchPrediction.frame_count} frames`
+                        : travPredictionFrame !== null
+                          ? `Segment result belongs to frame ${travPredictionFrame + 1}`
+                          : 'No segment result yet'
+                    }
                     type="button"
                   >
-                    Model segment {travPredictionFrame !== null ? `f${travPredictionFrame + 1}` : ''}
+                    Model segment {travBatchPrediction ? `all ${travBatchPrediction.frame_count}` : travPredictionFrame !== null ? `f${travPredictionFrame + 1}` : ''}
                   </button>
                   <span>
-                    {terrainLayerMode === 'segment' && travPrediction && !segmentMatchesFrame
-                      ? `Segment is single-frame: f${travPredictionFrame !== null ? travPredictionFrame + 1 : 'NaN'}, current f${frame + 1}. Showing dataset labels.`
+                    {terrainLayerMode === 'segment' && (travPrediction || travBatchPrediction) && !segmentMatchesFrame
+                      ? travBatchPrediction
+                        ? `Batch segment has no artifact for current frame f${frame + 1}. Showing dataset labels.`
+                        : `Segment is single-frame: f${travPredictionFrame !== null ? travPredictionFrame + 1 : 'NaN'}, current f${frame + 1}. Showing dataset labels.`
                       : datasetSemanticImage
                         ? `Dataset label frame ${frame + 1}`
                         : 'No semantic label for this frame'}
                   </span>
                 </div>
                 <div className="map-grid four">
-                  <MapImage title="Live frame" src={mainImage} />
-                  <MapImage title={showSegmentResult ? `Segment overlay f${frame + 1}` : 'Semantic groups'} src={terrainSecondaryImage} />
-                  <MapImage title={showSegmentResult ? `Traversability f${frame + 1}` : 'Traversability'} src={terrainTraversabilityImage} />
-                  <MapImage title={showSegmentResult ? `Risk f${frame + 1}` : 'Risk'} src={terrainRiskImage} />
+                  <MapImage title="Live frame" description="原始 RGB 当前帧" src={mainImage} />
+                  <MapImage title={showSegmentResult ? `Segment overlay f${frame + 1}` : 'Semantic groups'} description={showSegmentResult ? '模型类别结果半透明叠加到原图' : '数据集提供的逐帧语义标签'} src={terrainSecondaryImage} />
+                  <MapImage title={showSegmentResult ? `Traversability f${frame + 1}` : 'Traversability'} description="绿色可通行，黄色谨慎，红色障碍" src={terrainTraversabilityImage} />
+                  <MapImage title={showSegmentResult ? `Risk f${frame + 1}` : 'Risk'} description="绿色低风险，红色高风险；默认无模型结果时为空" src={terrainRiskImage} />
                 </div>
               </div>
             ) : null}
@@ -1806,10 +1879,13 @@ function App() {
   )
 }
 
-function MapImage({ title, src }: { title: string; src: string }) {
+function MapImage({ title, src, description }: { title: string; src: string; description?: string }) {
   return (
     <figure className="map-image">
-      <figcaption>{title}</figcaption>
+      <figcaption title={description ?? title}>
+        <span>{title}</span>
+        {description ? <small>{description}</small> : null}
+      </figcaption>
       {src ? <img src={src} alt={title} /> : <div className="empty-view">No map</div>}
     </figure>
   )

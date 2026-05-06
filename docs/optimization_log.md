@@ -226,6 +226,20 @@
 - 再把 predicted risk 接到 planner。
 - RL 继续保持 toy，直到有 simulator 或真实 offline evaluator。
 
+## 2026-05-06: Batch terrain segmentation action
+
+Completed:
+- Added `POST /api/traversability/predict-sequence` for sequence-level terrain segmentation.
+- Connected the endpoint to Job Registry through `/api/jobs/launch`.
+- `Segment Frame` now opens a choice: current frame or all frames.
+- Batch output stores per-frame overlay, traversability, risk, semantic assets and a manifest.
+- Terrain view now follows frame stepping after a batch run, so every frame can show its matching model artifacts.
+- Added visible map descriptions for RGB frame, overlay, traversability, and risk panels.
+
+Optimization notes:
+- Current-frame segmentation remains useful for quick interactive checks.
+- All-frame segmentation is now a real run artifact and can be replaced later by a heavier segmentation model without changing the UI flow.
+
 ## 2026-05-06: Terrain perception view state fix
 
 Completed:

@@ -19,6 +19,7 @@ from ..schemas import (
     SceneGenerateRequest,
     TrajectoryPredictRequest,
     TrajectoryTrainRequest,
+    TraversabilityBatchPredictRequest,
     TraversabilityPredictRequest,
     TraversabilityTrainRequest,
     WorldModelPredictRequest,
@@ -31,7 +32,7 @@ from .reconstruction import run_reconstruction
 from .rl import train_rl
 from .scenes import generate_scene
 from .trajectory import predict_trajectory, train_trajectory
-from .traversability import predict_sequence_traversability, train_traversability
+from .traversability import predict_all_traversability, predict_sequence_traversability, train_traversability
 from .world_model import predict_world_model, train_world_model
 
 
@@ -62,6 +63,10 @@ def _call_traversability_predict(body: dict[str, Any]) -> BaseModel:
     return predict_sequence_traversability(TraversabilityPredictRequest.model_validate(body))
 
 
+def _call_traversability_predict_sequence(body: dict[str, Any]) -> BaseModel:
+    return predict_all_traversability(TraversabilityBatchPredictRequest.model_validate(body))
+
+
 def _call_trajectory_train(body: dict[str, Any]) -> BaseModel:
     return train_trajectory(TrajectoryTrainRequest.model_validate(body))
 
@@ -81,6 +86,7 @@ JOB_HANDLERS: dict[str, tuple[str, JobHandler]] = {
     "/api/world-model/predict": ("world_model_predict", _call_world_model_predict),
     "/api/traversability/train": ("traversability_train", _call_traversability_train),
     "/api/traversability/predict": ("traversability_predict", _call_traversability_predict),
+    "/api/traversability/predict-sequence": ("traversability_predict_batch", _call_traversability_predict_sequence),
     "/api/trajectory/train": ("trajectory_train", _call_trajectory_train),
     "/api/trajectory/predict": ("trajectory_predict", _call_trajectory_predict),
     "/api/rl/train": ("rl_train", _call_rl_train),

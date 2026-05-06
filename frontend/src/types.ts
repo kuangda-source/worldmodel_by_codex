@@ -219,6 +219,25 @@ export type TraversabilityPredictResponse = {
   provenance: Provenance
 }
 
+export type TraversabilityFramePrediction = {
+  frame_index: number
+  frame_url: string
+  assets: AssetMap
+  metrics: Record<string, number>
+  counts: Record<string, number>
+}
+
+export type TraversabilityBatchPredictResponse = {
+  prediction_id: string
+  model_id: string
+  sequence_id: string
+  frame_count: number
+  frames: TraversabilityFramePrediction[]
+  manifest_url: string
+  metrics: Record<string, number>
+  provenance: Provenance
+}
+
 export type TrajectoryTrainResponse = {
   run_id: string
   model: string
