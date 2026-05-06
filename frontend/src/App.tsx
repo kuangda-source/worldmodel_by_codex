@@ -4,6 +4,8 @@ import {
   Brain,
   Car,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   CloudRain,
   Database,
   Gauge,
@@ -683,7 +685,8 @@ function App() {
   const [modelCatalog, setModelCatalog] = useState<ModelCatalogItem[]>([])
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [vehicleDraft, setVehicleDraft] = useState<Vehicle>(fallbackVehicle)
-  const [frame, setFrame] = usePlayback(sequence?.frames.length ?? 0, autopilot)
+  const frameCount = sequence?.frames.length ?? 0
+  const [frame, setFrame] = usePlayback(frameCount, autopilot)
 
   useEffect(() => {
     async function boot() {
@@ -1205,6 +1208,12 @@ function App() {
     })
   }
 
+  function stepFrame(delta: number) {
+    if (frameCount < 1) return
+    setAutopilot(false)
+    setFrame((current) => (current + delta + frameCount) % frameCount)
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -1230,9 +1239,18 @@ function App() {
         </nav>
         <div className="top-actions">
           <span>{terrain} · {weather} · {sequence?.metadata.time_of_day ?? 'NaN'}</span>
-          <button className="icon-button" onClick={() => setAutopilot((value) => !value)} title={autopilot ? 'Pause' : 'Play'} type="button">
-            {autopilot ? <Pause size={17} /> : <Play size={17} />}
-          </button>
+          <div className="playback-controls" aria-label="Frame playback controls">
+            <button className="icon-button" disabled={frameCount < 2} onClick={() => stepFrame(-1)} title="Previous frame" type="button">
+              <ChevronLeft size={17} />
+            </button>
+            <button className="icon-button" onClick={() => setAutopilot((value) => !value)} title={autopilot ? 'Pause' : 'Play'} type="button">
+              {autopilot ? <Pause size={17} /> : <Play size={17} />}
+            </button>
+            <button className="icon-button" disabled={frameCount < 2} onClick={() => stepFrame(1)} title="Next frame" type="button">
+              <ChevronRight size={17} />
+            </button>
+            <span className="frame-readout">{frameCount ? `${frame + 1}/${frameCount}` : 'NaN'}</span>
+          </div>
         </div>
       </header>
 
