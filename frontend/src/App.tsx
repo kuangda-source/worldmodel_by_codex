@@ -525,6 +525,15 @@ function tryParseJsonObject(text: string): Record<string, unknown> | null {
   }
 }
 
+function parseFrameIndex(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return Math.max(0, Math.floor(value))
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) return Math.max(0, Math.floor(parsed))
+  }
+  return null
+}
+
 function ModelCatalogPanel({ items, onLaunch }: { items: ModelCatalogItem[]; onLaunch: (action: ModelLaunchAction) => void }) {
   const [bodyDrafts, setBodyDrafts] = useState<Record<string, string>>({})
 
@@ -655,6 +664,7 @@ function App() {
   const [prediction, setPrediction] = useState<WorldModelPredictResponse | null>(null)
   const [travTrain, setTravTrain] = useState<TraversabilityTrainResponse | null>(null)
   const [travPrediction, setTravPrediction] = useState<TraversabilityPredictResponse | null>(null)
+  const [travPredictionFrame, setTravPredictionFrame] = useState<number | null>(null)
   const [trajTrain, setTrajTrain] = useState<TrajectoryTrainResponse | null>(null)
   const [trajPrediction, setTrajPrediction] = useState<TrajectoryPredictResponse | null>(null)
   const [rugdImport, setRugdImport] = useState<RUGDImportResponse | null>(null)
@@ -751,6 +761,24 @@ function App() {
   const metricProvenance = rlTrain?.provenance ?? travPrediction?.provenance
   const currentQuality = qualities.find((item) => item.sequence_id === sequence?.id)
   const currentSourceCard = sourceCards.find((item) => item.sequence_id === sequence?.id)
+  const runtimeModelCatalog = useMemo(
+    () =>
+      modelCatalog.map((item) => ({
+        ...item,
+        launch_actions: item.launch_actions.map((action) => {
+          if (action.endpoint !== '/api/traversability/predict') return action
+          return {
+            ...action,
+            body: {
+              ...action.body,
+              sequence_id: sequence?.id ?? action.body.sequence_id,
+              frame_index: frame,
+            },
+          }
+        }),
+      })),
+    [frame, modelCatalog, sequence?.id],
+  )
 
   async function refreshRuns(source = runSource) {
     try {
@@ -864,6 +892,7 @@ function App() {
         break
       case '/api/traversability/predict':
         setTravPrediction(result as TraversabilityPredictResponse)
+        setTravPredictionFrame(parseFrameIndex(action.body.frame_index) ?? frame)
         setActiveView('terrain')
         break
       case '/api/trajectory/train':
@@ -884,20 +913,24 @@ function App() {
   }
 
   async function launchCatalogAction(action: ModelLaunchAction) {
+    const normalizedAction =
+      action.endpoint === '/api/traversability/predict' && parseFrameIndex(action.body.frame_index) === null
+        ? { ...action, body: { ...action.body, frame_index: frame } }
+        : action
     await runAction(
-      action.label,
+      normalizedAction.label,
       async () => {
-        const launched = await api.launchAction(action)
+        const launched = await api.launchAction(normalizedAction)
         mergeJob(launched.job)
         const completedJob = launched.result ? launched.job : await waitForJob(launched.job.job_id)
         const result = launched.result ?? completedJob.result ?? {}
-        if (action.endpoint === '/api/rl/train' && typeof result.run_id === 'string') {
+        if (normalizedAction.endpoint === '/api/rl/train' && typeof result.run_id === 'string') {
           const replayData = await api.replay(result.run_id)
           return { result, replayData }
         }
         return { result }
       },
-      ({ result, replayData }) => applyLaunchResult(action, result, replayData),
+      ({ result, replayData }) => applyLaunchResult(normalizedAction, result, replayData),
     )
   }
 
@@ -1052,6 +1085,7 @@ function App() {
         }),
       (value) => {
         setTravPrediction(value)
+        setTravPredictionFrame(frame)
         setActiveView('terrain')
       },
     )
@@ -1474,10 +1508,10 @@ function App() {
             ) : null}
             {showExperimentViewport && activeView === 'terrain' ? (
               <div className="map-grid four">
-                <MapImage title="Overlay" src={perceptionOverlay} />
-                <MapImage title="Semantic groups" src={semanticImage} />
-                <MapImage title="Traversability" src={traversabilityImage} />
-                <MapImage title="Risk" src={perceptionRiskImage} />
+                <MapImage title="Live frame" src={mainImage} />
+                <MapImage title={travPrediction ? `Segment overlay f${travPredictionFrame ?? 'NaN'}` : 'Semantic groups'} src={travPrediction ? perceptionOverlay : semanticImage} />
+                <MapImage title={travPrediction ? `Traversability f${travPredictionFrame ?? 'NaN'}` : 'Traversability'} src={traversabilityImage} />
+                <MapImage title={travPrediction ? `Risk f${travPredictionFrame ?? 'NaN'}` : 'Risk'} src={perceptionRiskImage} />
               </div>
             ) : null}
             {showExperimentViewport && activeView === 'trajectory' ? (
@@ -1572,7 +1606,7 @@ function App() {
                 <Brain size={14} />
                 Dataset-Enabled Models
               </div>
-              <ModelCatalogPanel items={modelCatalog} onLaunch={launchCatalogAction} />
+              <ModelCatalogPanel items={runtimeModelCatalog} onLaunch={launchCatalogAction} />
             </section>
           </div>
 
@@ -1592,7 +1626,7 @@ function App() {
               <Brain size={14} />
               算法选择
             </div>
-            <ModelCatalogPanel items={modelCatalog} onLaunch={launchCatalogAction} />
+            <ModelCatalogPanel items={runtimeModelCatalog} onLaunch={launchCatalogAction} />
           </section>
 
           <section className="right-section">
